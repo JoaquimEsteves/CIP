@@ -12,10 +12,12 @@ log = Logger(debug=settings.DEBUG)
 
 class SupervisionHandler(object):
 	"""Class to wrap all Endpoints for TRS messages."""
-	def __init__(self, post_to_communicate , host=settings.DEFAULT_TRS_NAME FIX ME, port=settings.DEFAULT_TRS_PORT FIX ME):
+	def __init__(self, strings_to_communicate , host=settings.DEFAULT_TRS_NAME FIX ME, port=settings.DEFAULT_TRS_PORT FIX ME):
 		"""inits udp instance (TRS SERVER)"""
 		self.TCP = TCP(host, port)
-		self.language = post
+		
+		#communication_strings is an array!
+		self.communication_strings = post
 
 	def dispatch(self, data):
 		"""this method parses and checks for with feature is the "data" requesting
@@ -30,87 +32,18 @@ class SupervisionHandler(object):
 		protocol = data[0]
 		data = data[1:]
 		# dispatch to correct method
-		if protocol == "CONVEYOR": 
-			data = self._CONVEYOR(data)
-		elif protocol == "AGV:"
+		if protocol == PROTOCOL_I_AM_SUPPOSED_TO_IMPLEMENT: 
+			data = self._Handle(data)
+		else:
 			data = "ERR"
 		# put back the \n
 		data += "\n"
 		return data
-
-	def conveyor(self,data):
-		num_words = data[0]
-		words = data[1:]
-		
-	def warehouse(self, data):
-		num_words = data[0]
-		words = data[1:]
-		
-	def fresa(self, data):
-		num_words = data[0]
-		words = data[1:]
-		
-	def torno(self, data):
-		num_words = data[0]
-		words = data[1:]
-		
-	def quality_control(self, data):
-		num_words = data[0]
-		words = data[1:]
-		
-	def agv(self, data):
-		num_words = data[0]
-		words = data[1:]
-		
-	def conveyor(self, data):
-		num_words = data[0]
-		words = data[1:]
-		
-	def rfid(self, data):
-		num_words = data[0]
-		words = data[1:]
 	
-	
-
-	def _TRQtext(self, data):
-		# data = [<num_words>, <words>]"
-		def _translate(word):
-			"""go to this TRS translation file and search for the given word translation"""
-			translate_file = settings.TRANSLATE_TEXT_FILENAME.format(self.language)
-			with open(translate_file, "r") as f:
-				for row in f.readlines():
-					target_word, source_word = row.rstrip().split("\t")
-					if word == source_word:
-						return target_word
-			return None
-		num_words = data[0]
-		words = data[1:]
-		# validations of input
-		try:
-			num_words = int(num_words)
-		except ValueError, e:
-			log.error("Number of words is not an integer!")
-			return "TRR ERR"
-		if num_words != len(words):
-			log.error("Number of words doesn't match with the amount of words given!")
-			return "TRR ERR"
-		if num_words > settings.TRANSLATE_MAX_LIMIT:
-			log.error("Only translate {} words per request!".format(settings.TRANSLATE_MAX_LIMIT))
-			return "TRR ERR"
-
-		# translate words
-		trans_words = list()
-		for w in words:
-			tw = _translate(w)
-			if tw is None:
-				return "TRR NTA"
-			trans_words.append(tw)
-
-		if num_words != len(trans_words):
-			log.error("This should never happen but ohwell")
-			return "TRR ERR"
-		return "TRR t {} {}".format(len(trans_words), " ".join(trans_words))
-
+	def _Handle(self,data):
+		"""Receives data from the work stations and handles it accordingly"""
+		return data
+		
 
 #declare static port variables for input simplicity
 if __name__ == "__main__":
