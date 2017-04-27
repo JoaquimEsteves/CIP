@@ -16,3 +16,13 @@ BUFFERSIZE = 4096 * 1024
 TIMEOUT_DELAY = 5
 
 # Misc properties
+
+acceptable_IDs = ["QC","StorageAndAssembly","Scorbot","AGV","Belt", "RFID"]
+
+def getMessagesForStation(name):
+	if name == "QC"
+		return ["[SUP]Check Stage1", "[SUP] Check Stage2"]
+	elif name == "StorageAndAssembly"
+		return ["[SUP]Start Stage1", "[SUP] Start Stage2"]
+	elif name == "Scorbot"
+		

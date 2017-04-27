@@ -8,7 +8,7 @@ log = Logger(debug=settings.DEBUG)
 
 class Protocol(object):
 
-    def __init__(self, host, port, buffer_size=settings.BUFFERSIZE, max_connections):
+    def __init__(self, host, port, buffer_size=settings.BUFFERSIZE, max_connections=1):
         self.host = host
         self.port = int(port)
         self.buffer_size = buffer_size
@@ -24,6 +24,7 @@ class TCP(Protocol):
     """Class to wrap all TCP interactions between client and server"""
     def __init__(self, host, port=settings.DEFAULT_PORT, m_connections=1):
         super(TCP, self).__init__(host, port, buffer_size=settings.BUFFERSIZE, max_connections = m_connections)
+        self.connections = []
 
     def request(self, station , data):
         """makes tcp socket connection to host and port machine
@@ -57,6 +58,38 @@ class TCP(Protocol):
         data = self._remove_new_line(data)
         return data
 
+	def request(self, ip, port, data):
+		"""makes tcp socket connection to host and port machine
+        returns the raw response from the host machine"""
+        # Create a new socket using the given address family, socket type and protocol number
+        sock = socket(AF_INET, SOCK_STREAM)
+        # Set the value of the given socket option (see the Unix manual page setsockopt(2)).
+        sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        try:
+            # Connect to a remote socket at address of the station.
+            sock.connect((ip, port))
+            # define timout to settings.TIMEOUT_DELAY
+            sock.settimeout(settings.TIMEOUT_DELAY)
+            log.debug("[TCP] Sending request to {}:{} > \"{}\".".format(ip, port, self._remove_new_line(data)[:64]))
+            # Send data to the socket.
+            sock.sendall(data)
+            # Receive data from the socket (max amount is the buffer size).
+            data = sock.recv(self.buffer_size)
+            log.debug("[TCP] Got back > \"{}\".".format(self._remove_new_line(data)[:64]))
+        # in case of timeout
+        except timeout, msg:
+            log.error("[TCP] Request Timeout. {}".format(msg))
+            data = "ERR"
+        # in case of error
+        except error, msg:
+            log.error("[TCP] Something happen when trying to connect to {}:{}. Error: {}".format(ip, port, msg))
+            data = "ERR"
+        finally:
+            # Close socket connection
+            sock.close()
+        data = self._remove_new_line(data)
+        return data		
+
     def run(self, handler=None):
         """TCP server. Run the server"""
         try:
@@ -81,6 +114,12 @@ class TCP(Protocol):
             connection, client_address = sock.accept()
             # Get connection HostIP and HostPORT
             addr_ip, addr_port = client_address
+			
+			#ASK WHO THEY ARE
+			response_from_anon = self.request(self,addr_ip,addr_port,"WhoAreYou")
+			if response_from_anon not in settings.acceptable_IDs:
+				connection.close()
+				log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon)
 			
 			#----------
 			#ASK WHO THEY ARE?!
@@ -112,3 +151,13 @@ class TCP(Protocol):
             finally:
                 # Close socket connection
                 connection.close()
+
+
+if __name__ == "main":
+	log.info("Starting server")
+	tcp_socket = socket.socket(AF_INET, socket.SOCK_STREAM)
+	try:
+		client_address = tcp_socket.accept()
+		addresses = request(client_address[0], client_address[1])
+		
+		
