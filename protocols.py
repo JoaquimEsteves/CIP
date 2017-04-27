@@ -64,7 +64,7 @@ class TCP(Protocol):
         # Create a new socket using the given address family, socket type and protocol number
         sock = socket(AF_INET, SOCK_STREAM)
         # Set the value of the given socket option (see the Unix manual page setsockopt(2)).
-        sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        #sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         try:
             # Connect to a remote socket at address of the station.
             sock.connect((ip, port))
@@ -75,6 +75,7 @@ class TCP(Protocol):
             sock.sendall(data)
             # Receive data from the socket (max amount is the buffer size).
             data = sock.recv(self.buffer_size)
+            print 1
             log.debug("[TCP] Got back > \"{}\".".format(self._remove_new_line(data)[:64]))
         # in case of timeout
         except timeout, msg:
@@ -83,6 +84,9 @@ class TCP(Protocol):
         # in case of error
         except error, msg:
             log.error("[TCP] Something happen when trying to connect to {}:{}. Error: {}".format(ip, port, msg))
+            print "error incoming\n\n"
+            print str(error)
+            print "error out\n\n"
             data = "ERR"
         finally:
             # Close socket connection
@@ -111,37 +115,41 @@ class TCP(Protocol):
 
         log.info("TCP Server is ready for connection on [{}:{}].".format(self.host, self.port))
 
-        while len(self.connections) != 6:      #NOT WHILE TRUE, MAYBE WHILE NUMBER OF CONNECTIONS IS NOT AS BIG AS NUMBER OF GROUPS?
+        while 1:      #NOT WHILE TRUE, MAYBE WHILE NUMBER OF CONNECTIONS IS NOT AS BIG AS NUMBER OF GROUPS?
             # Accept a connection.
-            connection, client_address = sock.accept()
-            # Get connection HostIP and HostPORT
-            addr_ip, addr_port = client_address
-			
+            try:
+                connection, client_address = sock.accept()
+                # Get connection HostIP and HostPORT
+                addr_ip, addr_port = client_address
+            except error:
+				connection.close()
             #ASK WHO THEY ARE
-            response_from_anon = self.request(addr_ip,addr_port,"WhoAreYou")
-            if response_from_anon not in settings.acceptable_IDs:
-                connection.close()
-                log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon))
-            else:
+            #response_from_anon = self.request(addr_ip,addr_port,"WhoAreYou")
+            #print response_from_anon
+            #if response_from_anon not in settings.acceptable_IDs:
+                #connection.close()
+            #    log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon))
+            #else:
                 #Save the connection for further use!
-				self.connections.append([connection,response_from_anon])
+			#	self.connections.append([connection,response_from_anon])
 			
             #----------
 			#ASK WHO THEY ARE?!
 			#----------
             #try:
             #   data = ""
-            #    data_connection = connection.recv(self.buffer_size)
-            #    while data_connection[-1] != "\n":
-            #        data += data_connection
-            #        log.debug("Received {} bytes".format(len(data)))
-            #        data_connection = connection.recv(self.buffer_size)
-            #    data += data_connection
+            #   data_connection = connection.recv(self.buffer_size)
+            #   while data_connection[-1] != "\n":
+            #       data += data_connection
+            #       log.debug("Received {} bytes".format(len(data)))
+            #       data_connection = connection.recv(self.buffer_size)
+            #   data += data_connection
 
-            #    log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
+            #   log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
 
-            #    if data:
-            #        if not handler:
+            #   if data:
+            #       print data				      
+            #       if not handler:
             #            raise ValueError("Handler is required!")
             #        data = handler.dispatch(data)
 
