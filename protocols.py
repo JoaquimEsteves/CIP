@@ -94,27 +94,6 @@ class TCP(Protocol):
         data = self._remove_new_line(data)
         return data		
 
-    def run(self):
-        """TCP server. Run the server"""
-        try:
-            # Create a new socket using the given address family, socket type and protocol number
-            sock = socket(AF_INET, SOCK_STREAM)
-        except error, msg:
-            log.error(msg)
-            sock.close()
-            raise error
-        try:
-            # Bind socket to local host and port
-            sock.bind((self.host, self.port))
-            # Listen for connections made to the socket.
-            sock.listen(self.max_connections)
-        except error , msg:
-            log.error(msg)
-            sock.close()
-            raise error
-
-        log.info("TCP Server is ready for connection on [{}:{}].".format(self.host, self.port))
-
     def run(self, handler=None):
         """TCP server. TRS runs this server"""
         try:
@@ -122,6 +101,7 @@ class TCP(Protocol):
             sock = socket(AF_INET, SOCK_STREAM)
         except error, msg:
             log.error(msg)
+            sock.close()
             raise error
         try:
             # Bind socket to local host and port
@@ -130,15 +110,20 @@ class TCP(Protocol):
             sock.listen(self.max_connections)
         except error , msg:
             log.error(msg)
+            sock.close()
             raise error
 
         log.info("TCP Server is ready for connection on [{}:{}].".format(self.host, self.port))
-
+		
         while True:
             # Accept a connection.
             connection, client_address = sock.accept()
             # Get connection HostIP and HostPORT
             addr_ip, addr_port = client_address
+            try:
+                print a = self.request(addr_ip,addr_port,"hi")
+            except:
+				connection.close()
             try:
                 # Receive data from socket
                 data = ""
