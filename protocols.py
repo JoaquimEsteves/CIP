@@ -119,7 +119,7 @@ class TCP(Protocol):
             response_from_anon = self.request(self,addr_ip,addr_port,"WhoAreYou")
             if response_from_anon not in settings.acceptable_IDs:
 				connection.close()
-				log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon)
+				log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon))
 			
 			#----------
 			#ASK WHO THEY ARE?!
@@ -150,11 +150,4 @@ class TCP(Protocol):
                 connection.close()
 
 
-if __name__ == "main":
-	log.info("Starting server")
-	tcp_socket = socket.socket(AF_INET, socket.SOCK_STREAM)
-	try:
-		client_address = tcp_socket.accept()
-		#addresses = request(client_address[0], client_address[1])
-		
 		
