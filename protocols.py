@@ -59,7 +59,7 @@ class TCP(Protocol):
         return data
 
     def request(self, ip, port, data):
-		"""makes tcp socket connection to host and port machine
+        """makes tcp socket connection to host and port machine
         returns the raw response from the host machine"""
         # Create a new socket using the given address family, socket type and protocol number
         sock = socket(AF_INET, SOCK_STREAM)
@@ -117,16 +117,16 @@ class TCP(Protocol):
             # Get connection HostIP and HostPORT
             addr_ip, addr_port = client_address
 			
-			#ASK WHO THEY ARE
+            #ASK WHO THEY ARE
             response_from_anon = self.request(addr_ip,addr_port,"WhoAreYou")
             if response_from_anon not in settings.acceptable_IDs:
-				connection.close()
-				log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon))
+                connection.close()
+                log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon))
             else:
-				#Save the connection for further use!
+                #Save the connection for further use!
 				self.connections.append([connection,response_from_anon])
 			
-			#----------
+            #----------
 			#ASK WHO THEY ARE?!
 			#----------
             #try:
