@@ -152,9 +152,9 @@ class TCP(Protocol):
                 log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
 
                 if data:
-                    if not handler:
-                        raise ValueError("Handler is required!")
-                    data = handler.dispatch(data)
+                    #if not handler:
+                    #    raise ValueError("Handler is required!")
+                    #data = handler.dispatch(data)
 
                     log.debug("Sending back > \"{}\".".format(self._remove_new_line(data)[:64]))
                     # Send data to the socket.
