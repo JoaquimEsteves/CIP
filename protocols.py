@@ -58,23 +58,17 @@ class TCP(Protocol):
         data = self._remove_new_line(data)
         return data
 
-    def request(self, ip, port, data):
+    def request(self, connection, data):
         """makes tcp socket connection to host and port machine
         returns the raw response from the host machine"""
-        # Create a new socket using the given address family, socket type and protocol number
-        sock = socket(AF_INET, SOCK_STREAM)
-        # Set the value of the given socket option (see the Unix manual page setsockopt(2)).
-        #sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         try:
-            # Connect to a remote socket at address of the station.
-            sock.connect((ip, port))
-            # define timout to settings.TIMEOUT_DELAY
-            sock.settimeout(settings.TIMEOUT_DELAY)
-            log.debug("[TCP] Sending request to {}:{} > \"{}\".".format(ip, port, self._remove_new_line(data)[:64]))
+            
+            #log.debug("[TCP] Sending request to {}:{} > \"{}\".".format(ip, port, self._remove_new_line(data)[:64]))
             # Send data to the socket.
-            sock.sendall(data)
+            print "hi?"
+            connection.send(data)
             # Receive data from the socket (max amount is the buffer size).
-            data = sock.recv(self.buffer_size)
+            data = connection.recv(self.buffer_size)
             print 1
             log.debug("[TCP] Got back > \"{}\".".format(self._remove_new_line(data)[:64]))
         # in case of timeout
@@ -90,7 +84,7 @@ class TCP(Protocol):
             data = "ERR"
         finally:
             # Close socket connection
-            sock.close()
+            connection.close()
         data = self._remove_new_line(data)
         return data		
 
@@ -117,11 +111,14 @@ class TCP(Protocol):
 		
         while True:
             # Accept a connection.
+            print "please"
             connection, client_address = sock.accept()
             # Get connection HostIP and HostPORT
+            print "pretty please"
             addr_ip, addr_port = client_address
             try:
-                print a = self.request(addr_ip,addr_port,"hi")
+                a = self.request(connection,"hi")
+                print a
             except:
 				connection.close()
             try:
