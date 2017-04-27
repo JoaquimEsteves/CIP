@@ -26,7 +26,7 @@ class TCP(Protocol):
         super(TCP, self).__init__(host, port, buffer_size=settings.BUFFERSIZE, max_connections = m_connections)
         self.connections = []
 
-    def request(self, station , data):
+    def requestStation(self, station , data):
         """makes tcp socket connection to host and port machine
         returns the raw response from the host machine"""
         # Create a new socket using the given address family, socket type and protocol number
@@ -58,7 +58,7 @@ class TCP(Protocol):
         data = self._remove_new_line(data)
         return data
 
-	def request(self, ip, port, data):
+    def request(self, ip, port, data):
 		"""makes tcp socket connection to host and port machine
         returns the raw response from the host machine"""
         # Create a new socket using the given address family, socket type and protocol number
@@ -90,13 +90,14 @@ class TCP(Protocol):
         data = self._remove_new_line(data)
         return data		
 
-    def run(self, handler=None):
+    def run(self):
         """TCP server. Run the server"""
         try:
             # Create a new socket using the given address family, socket type and protocol number
             sock = socket(AF_INET, SOCK_STREAM)
         except error, msg:
             log.error(msg)
+            sock.close()
             raise error
         try:
             # Bind socket to local host and port
@@ -105,49 +106,53 @@ class TCP(Protocol):
             sock.listen(self.max_connections)
         except error , msg:
             log.error(msg)
+            sock.close()
             raise error
 
         log.info("TCP Server is ready for connection on [{}:{}].".format(self.host, self.port))
 
-        while True:      #NOT WHILE TRUE, MAYBE WHILE NUMBER OF CONNECTIONS IS NOT AS BIG AS NUMBER OF GROUPS?
+        while len(self.connections) != 6:      #NOT WHILE TRUE, MAYBE WHILE NUMBER OF CONNECTIONS IS NOT AS BIG AS NUMBER OF GROUPS?
             # Accept a connection.
             connection, client_address = sock.accept()
             # Get connection HostIP and HostPORT
             addr_ip, addr_port = client_address
 			
 			#ASK WHO THEY ARE
-            response_from_anon = self.request(self,addr_ip,addr_port,"WhoAreYou")
+            response_from_anon = self.request(addr_ip,addr_port,"WhoAreYou")
             if response_from_anon not in settings.acceptable_IDs:
 				connection.close()
 				log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon))
+            else:
+				#Save the connection for further use!
+				self.connections.append([connection,response_from_anon])
 			
 			#----------
 			#ASK WHO THEY ARE?!
 			#----------
-            try:
-                data = ""
-                data_connection = connection.recv(self.buffer_size)
-                while data_connection[-1] != "\n":
-                    data += data_connection
-                    log.debug("Received {} bytes".format(len(data)))
-                    data_connection = connection.recv(self.buffer_size)
-                data += data_connection
+            #try:
+            #   data = ""
+            #    data_connection = connection.recv(self.buffer_size)
+            #    while data_connection[-1] != "\n":
+            #        data += data_connection
+            #        log.debug("Received {} bytes".format(len(data)))
+            #        data_connection = connection.recv(self.buffer_size)
+            #    data += data_connection
 
-                log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
+            #    log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
 
-                if data:
-                    if not handler:
-                        raise ValueError("Handler is required!")
-                    data = handler.dispatch(data)
+            #    if data:
+            #        if not handler:
+            #            raise ValueError("Handler is required!")
+            #        data = handler.dispatch(data)
 
-                    log.debug("Sending back > \"{}\".".format(self._remove_new_line(data)[:64]))
+            #        log.debug("Sending back > \"{}\".".format(self._remove_new_line(data)[:64]))
                     # Send data to the socket.
-                    connection.sendall(data)
-                else:
-                    break
-            finally:
+            #        connection.sendall(data)
+            #    else:
+            #        break
+            #finally:
                 # Close socket connection
-                connection.close()
+            #   connection.close()
 
 
 		
