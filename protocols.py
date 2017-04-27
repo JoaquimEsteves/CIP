@@ -115,52 +115,55 @@ class TCP(Protocol):
 
         log.info("TCP Server is ready for connection on [{}:{}].".format(self.host, self.port))
 
-        while 1:      #NOT WHILE TRUE, MAYBE WHILE NUMBER OF CONNECTIONS IS NOT AS BIG AS NUMBER OF GROUPS?
+    def run(self, handler=None):
+        """TCP server. TRS runs this server"""
+        try:
+            # Create a new socket using the given address family, socket type and protocol number
+            sock = socket(AF_INET, SOCK_STREAM)
+        except error, msg:
+            log.error(msg)
+            raise error
+        try:
+            # Bind socket to local host and port
+            sock.bind((self.host, self.port))
+            # Listen for connections made to the socket.
+            sock.listen(self.max_connections)
+        except error , msg:
+            log.error(msg)
+            raise error
+
+        log.info("TCP Server is ready for connection on [{}:{}].".format(self.host, self.port))
+
+        while True:
             # Accept a connection.
+            connection, client_address = sock.accept()
+            # Get connection HostIP and HostPORT
+            addr_ip, addr_port = client_address
             try:
-                connection, client_address = sock.accept()
-                # Get connection HostIP and HostPORT
-                addr_ip, addr_port = client_address
-            except error:
-				connection.close()
-            #ASK WHO THEY ARE
-            #response_from_anon = self.request(addr_ip,addr_port,"WhoAreYou")
-            #print response_from_anon
-            #if response_from_anon not in settings.acceptable_IDs:
-                #connection.close()
-            #    log.info("Somebody I don't know tried to connect to me on [{}:{}] with data {}.".format(addr_ip, addr_port,response_from_anon))
-            #else:
-                #Save the connection for further use!
-			#	self.connections.append([connection,response_from_anon])
-			
-            #----------
-			#ASK WHO THEY ARE?!
-			#----------
-            #try:
-            #   data = ""
-            #   data_connection = connection.recv(self.buffer_size)
-            #   while data_connection[-1] != "\n":
-            #       data += data_connection
-            #       log.debug("Received {} bytes".format(len(data)))
-            #       data_connection = connection.recv(self.buffer_size)
-            #   data += data_connection
+                # Receive data from socket
+                data = ""
+                data_connection = connection.recv(self.buffer_size)
+                while data_connection[-1] != "\n":
+                    data += data_connection
+                    log.debug("Received {} bytes".format(len(data)))
+                    data_connection = connection.recv(self.buffer_size)
+                data += data_connection
 
-            #   log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
+                log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
 
-            #   if data:
-            #       print data				      
-            #       if not handler:
-            #            raise ValueError("Handler is required!")
-            #        data = handler.dispatch(data)
+                if data:
+                    if not handler:
+                        raise ValueError("Handler is required!")
+                    data = handler.dispatch(data)
 
-            #        log.debug("Sending back > \"{}\".".format(self._remove_new_line(data)[:64]))
+                    log.debug("Sending back > \"{}\".".format(self._remove_new_line(data)[:64]))
                     # Send data to the socket.
-            #        connection.sendall(data)
-            #    else:
-            #        break
-            #finally:
+                    connection.sendall(data)
+                else:
+                    break
+            finally:
                 # Close socket connection
-            #   connection.close()
+                connection.close()
 
 
 		
