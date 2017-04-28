@@ -13,7 +13,7 @@ DEFAULT_PORT = 58000
 BUFFERSIZE = 4096 * 1024
 
 # Timeout delay that we accept between connections, in seconds
-TIMEOUT_DELAY = 5
+TIMEOUT_DELAY = 30
 
 # Misc properties
 

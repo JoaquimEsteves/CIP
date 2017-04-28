@@ -24,7 +24,7 @@ class TCP(Protocol):
     """Class to wrap all TCP interactions between client and server"""
     def __init__(self, host, port=settings.DEFAULT_PORT, m_connections=1):
         super(TCP, self).__init__(host, port, buffer_size=settings.BUFFERSIZE, max_connections = m_connections)
-        self.connections = []
+        self._name = ""
 
     def requestStation(self, station , data):
         """makes tcp socket connection to host and port machine
@@ -137,9 +137,11 @@ class TCP(Protocol):
                     connection.close()
                 else:
                     connection.send("Welcome to the fam, fam!\n")
-                    station_name = data
+                    return [connection,data[:-2]]
+                    #station_name = data
 					#WE GUCCI
-					#handler.DOSHIT(connection,station_name)
+                    #if handler != None:
+                    #    handler.handle(connection)
                 
            # in case of timeout
             except timeout, msg:
