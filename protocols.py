@@ -65,7 +65,7 @@ class TCP(Protocol):
             
             #log.debug("[TCP] Sending request to {}:{} > \"{}\".".format(ip, port, self._remove_new_line(data)[:64]))
             # Send data to the socket.
-            print "hi?"
+            #print "hi?"
             connection.send(data)
             # Receive data from the socket (max amount is the buffer size).
             data = connection.recv(self.buffer_size)
@@ -117,35 +117,40 @@ class TCP(Protocol):
             print "pretty please"
             addr_ip, addr_port = client_address
             try:
-                a = self.request(connection,"hi")
-                print a
-            except:
-				connection.close()
-            try:
-                # Receive data from socket
+                #a = self.request(connection,"hi_please receive this!")
+                #print a
+                #MONSTERS
+                data = "WhoAreYou"
+                connection.send(data)
+            # Receive data from the socket (max amount is the buffer size).
                 data = ""
                 data_connection = connection.recv(self.buffer_size)
+                #Keep receiving until I find a \n!
                 while data_connection[-1] != "\n":
                     data += data_connection
                     log.debug("Received {} bytes".format(len(data)))
                     data_connection = connection.recv(self.buffer_size)
                 data += data_connection
-
-                log.debug("Got request from {}:{} > \"{}\".".format(addr_ip, addr_port, self._remove_new_line(data_connection)[:64]))
-
-                if data:
-                    #if not handler:
-                    #    raise ValueError("Handler is required!")
-                    #data = handler.dispatch(data)
-
-                    log.debug("Sending back > \"{}\".".format(self._remove_new_line(data)[:64]))
-                    # Send data to the socket.
-                    connection.sendall(data)
+                log.debug("[TCP] Got back > \"{}\".".format(data[:-2]))
+                if data[:-2] not in settings.acceptable_IDs:
+                    connection.send("I DON'T KNOW YOU!\n")
+                    connection.close()
                 else:
-                    break
-            finally:
-                # Close socket connection
-                connection.close()
-
+                    connection.send("Welcome to the fam, fam!\n")
+                    station_name = data
+					#WE GUCCI
+					#handler.DOSHIT(connection,station_name)
+                
+           # in case of timeout
+            except timeout, msg:
+                log.error("[TCP] Request Timeout. {}".format(msg))
+                data = "ERR"
+                # in case of error
+            except error, msg:
+                log.error("[TCP] Something happen when trying to connect to {}:{}. Error: {}".format(addr_ip, addr_port, msg))
+                print "error incoming\n\n"
+                print str(error)
+                print "error out\n\n"
+                data = "ERR"
 
 		
