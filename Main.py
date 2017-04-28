@@ -1,3 +1,5 @@
+# !/usr/bin/python
+# -*- coding: utf-8 -*-
 import settings
 import protocols
 import socket
@@ -32,8 +34,8 @@ def request(connection, data):
         return data		
 
 
-if __name__ == "main":
-    
+if __name__ == "__main__":
+    print "hi"
     #"QC","StorageAndAssembly","Scorbot","AGV","Belt", "RFID"]
     host = socket.gethostbyaddr(socket.gethostname())
     tcp1 = protocols.TCP(host, port=8881)
