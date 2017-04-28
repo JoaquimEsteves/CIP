@@ -139,7 +139,8 @@ class TCP(Protocol):
                     connection.send("Welcome to the fam, fam!\n")
                     station_name = data
 					#WE GUCCI
-					#handler.DOSHIT(connection,station_name)
+                    if handler != None:
+                        handler.DOSHIT(connection,station_name)
                 
            # in case of timeout
             except timeout, msg:
