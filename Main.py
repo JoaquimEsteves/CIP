@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import settings
 import protocols
 import socket
@@ -33,34 +35,34 @@ def request(connection, data):
 
 
 if __name__ == "main":
-    log.info("Starting server")
+	log.info("Starting server")
     
     #"QC","StorageAndAssembly","Scorbot","AGV","Belt", "RFID"]
-    host = socket.gethostbyaddr(socket.gethostname())
+	host = socket.gethostbyaddr(socket.gethostname())
     
-    tcp_cons = [
-		tcp1 = protocols.TCP(host,port=8881),
-		tcp2 = protocols.TCP(host,port=8882),
-		tcp3 = protocols.TCP(host,port=8883),
-		tcp4 = protocols.TCP(host,port=8884),
-		tcp5 = protocols.TCP(host,port=8885),
-		tcp6 = protocols.TCP(host,port=8886) 
-    ]
+	tcp1 = protocols.TCP(host,port=8881)
+	tcp2 = protocols.TCP(host,port=8882)
+	tcp3 = protocols.TCP(host,port=8883)
+	tcp4 = protocols.TCP(host,port=8884)
+	tcp5 = protocols.TCP(host,port=8885)
+	tcp6 = protocols.TCP(host,port=8886)
     
-    Station = {}
+	tcp_cons = [ tcp1, tcp2, tcp3, tcp4, tcp5, tcp6]
     
-    log.info("Waiting connection from the stations!")
-    for tcp in tcp_cons:
+	Station = {}
+    
+	log.info("Waiting connection from the stations!")
+	for tcp in tcp_cons:
 		details = tcp.run()
 		log.info("{} - Connected".format(details[1]))
 		Station.update( { details[1] : details[0] } )
     
-    log.info("Cool, now that we're all connected let's get to work!")
+	log.info("Cool, now that we're all connected let's get to work!")
 	
 	stage = 0
     
-    result = request(Station["Belt"], "[SUP]GOTO STORAGE")
-    if result[:-2] == "OK":
+	result = request(Station["Belt"], "[SUP]GOTO STORAGE")
+	if result[:-2] == "OK":
 		stage = 1
 		log.info("hurray")
 	
