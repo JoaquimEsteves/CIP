@@ -18,7 +18,7 @@ def request(connection, data):
             connection.send(data)
             # Receive data from the socket (max amount is the buffer size).
             data = connection.recv(settings.BUFFERSIZE)
-            log.debug("[TCP] Got back > \"{}\".".format(data)
+            log.debug("[TCP] Got back > \"{}\".".format(data))
         # in case of timeout
         #except timeout, msg:
         #    log.error("[TCP] Request Timeout. {}".format(msg))
@@ -27,7 +27,7 @@ def request(connection, data):
         except Exception as e:
             log.error("[TCP] Something happen when trying to connect to")
             print "error incoming\n\n"
-            #print str(error)
+            print e
             print "error out\n\n"
             data = "ERR"
         finally:
