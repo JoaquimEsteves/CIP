@@ -3,6 +3,8 @@
 import settings
 import protocols
 import socket
+import traceback
+import logging
 from Station import *
 from utils import Logger
 from thread import start_new_thread
@@ -15,17 +17,17 @@ def request(connection, data):
         try:
             connection.send(data)
             # Receive data from the socket (max amount is the buffer size).
-            data = connection.recv(protocols.buffer_size)
-            log.debug("[TCP] Got back > \"{}\".".format(protocols._remove_new_line(data)[:64]))
+            data = connection.recv(settings.BUFFERSIZE)
+            log.debug("[TCP] Got back > \"{}\".".format(data)
         # in case of timeout
-        except protocols.timeout, msg:
-            log.error("[TCP] Request Timeout. {}".format(msg))
-            data = "ERR"
+        #except timeout, msg:
+        #    log.error("[TCP] Request Timeout. {}".format(msg))
+        #    data = "ERR"
         # in case of error
-        except protocols.error, msg:
+        except Exception as e:
             log.error("[TCP] Something happen when trying to connect to")
             print "error incoming\n\n"
-            print str(protocols.error)
+            #print str(error)
             print "error out\n\n"
             data = "ERR"
         finally:
