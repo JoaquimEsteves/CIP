@@ -15,17 +15,17 @@ def request(connection, data):
         try:
             connection.send(data)
             # Receive data from the socket (max amount is the buffer size).
-            data = connection.recv(self.buffer_size)
-            log.debug("[TCP] Got back > \"{}\".".format(self._remove_new_line(data)[:64]))
+            data = connection.recv(protocols.buffer_size)
+            log.debug("[TCP] Got back > \"{}\".".format(protocols._remove_new_line(data)[:64]))
         # in case of timeout
-        except timeout, msg:
+        except protocols.timeout, msg:
             log.error("[TCP] Request Timeout. {}".format(msg))
             data = "ERR"
         # in case of error
-        except error, msg:
+        except protocols.error, msg:
             log.error("[TCP] Something happen when trying to connect to")
             print "error incoming\n\n"
-            print str(error)
+            print str(protocols.error)
             print "error out\n\n"
             data = "ERR"
         finally:

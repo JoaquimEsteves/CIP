@@ -77,7 +77,7 @@ class TCP(Protocol):
             data = "ERR"
         # in case of error
         except error, msg:
-            log.error("[TCP] Something happen when trying to connect to {}:{}. Error: {}".format(ip, port, msg))
+            log.error("[TCP] Something happen when trying to connect to {}:{}. Error: {}".format(self.host, self.port, msg))
             print "error incoming\n\n"
             print str(error)
             print "error out\n\n"
@@ -139,9 +139,9 @@ class TCP(Protocol):
                     connection.send("Welcome to the fam, fam!\n")
                     return [connection,data[:-2]]
                     #station_name = data
-					#WE GUCCI
+                    # #WE GUCCI
                     #if handler != None:
-                    #    handler.handle(connection)
+                    #handler.handle(connection)
                 
            # in case of timeout
             except timeout, msg:
