@@ -38,17 +38,18 @@ if __name__ == "__main__":
     print "hi"
     #"QC","StorageAndAssembly","Scorbot","AGV","Belt", "RFID"]
     host = socket.gethostbyaddr(socket.gethostname())
-    tcp1 = protocols.TCP(host, port=8881)
-    tcp2 = protocols.TCP(host, port=8882)
-    tcp3 = protocols.TCP(host, port=8883)
-    tcp4 = protocols.TCP(host, port=8884)
-    tcp5 = protocols.TCP(host, port=8885)
-    tcp6 = protocols.TCP(host, port=8886)
+    print host
+    tcp1 = protocols.TCP(host[0], port=8881)
+    tcp2 = protocols.TCP(host[0], port=8882)
+    tcp3 = protocols.TCP(host[0], port=8883)
+    tcp4 = protocols.TCP(host[0], port=8884)
+    tcp5 = protocols.TCP(host[0], port=8885)
+    tcp6 = protocols.TCP(host[0], port=8886)
 
     tcp_cons = [tcp1, tcp2, tcp3, tcp4, tcp5, tcp6]
 
     Station = {}
-    
+
     log.info("Waiting connection from the stations!")
     for tcp in tcp_cons:
         details = tcp.run()
