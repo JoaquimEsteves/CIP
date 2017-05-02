@@ -1,6 +1,8 @@
 Instructions for running the program:
 
-	1) Add instructions here boys
+	1) run >python Main.py
+	2) If any library is missing, use >pip install *MISSING_LIBRARY_HERE*
+	3) Other stations connect to the hostname.
 	
 General Organization of the Files (Alphabetical Order):
 	
