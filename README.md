@@ -15,7 +15,7 @@ Instructions for running the program:
 General Organization of the Files:
 	
 	protocols.py:
-		- This is where the TCP, UDP class is stored.
+		- This is where the TCP class is stored.
 	
 	settings.py:
 		- This is just a file with a bunch of constants
