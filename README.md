@@ -12,7 +12,7 @@ Instructions for running the program:
 	3) Other stations connect to the hostname.
 	4) When you run the main file it'll tell you what is the IP and port you'll have to connect  to.
 	
-General Organization of the Files (Alphabetical Order):
+General Organization of the Files:
 	
 	protocols.py:
 		- This is where the TCP, UDP class is stored.
