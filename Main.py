@@ -39,8 +39,9 @@ def request(connection, data):
 if __name__ == "__main__":
     print "hi"
     #"QC","StorageAndAssembly","Scorbot","AGV","Belt", "RFID"]
-    host = socket.gethostbyaddr(socket.gethostname())
-    print host
+    #host = socket.gethostbyaddr(socket.gethostname())
+    #print host
+    host = [socket.gethostname()]
     tcp1 = protocols.TCP(host[0], port=8881)
     tcp2 = protocols.TCP(host[0], port=8882)
     tcp3 = protocols.TCP(host[0], port=8883)
