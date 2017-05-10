@@ -126,10 +126,10 @@ class TCP(Protocol):
                 data = ""
                 data_connection = connection.recv(self.buffer_size)
                 #Keep receiving until I find a \n!
-                while data_connection[-1] != "\n":
-                    data += data_connection
-                    log.debug("Received {} bytes".format(len(data)))
-                    data_connection = connection.recv(self.buffer_size)
+                #while data_connection[-1] != "\n":
+                #    data += data_connection
+                #    log.debug("Received {} bytes".format(len(data)))
+                #    data_connection = connection.recv(self.buffer_size)
                 data += data_connection
                 log.debug("[TCP] Got back > \"{}\".".format(data[:-2]))
                 if data[:-2] not in settings.acceptable_IDs:
