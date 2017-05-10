@@ -32,10 +32,10 @@ while true
     
     while connection.BytesAvailable == 0 
         
-        pause(0.1)
+        %pause(0.1)
         
     end
-    
+
     DataReceived = fread(connection, connection.BytesAvailable,'char');
     fprintf('\n%s \n',DataReceived)
     
@@ -58,10 +58,11 @@ while true
                                         % Belt\n
                                         % RFID\n
                                         % QC\n
-            
-            fwrite(connection, message, 'uint8');
             fprintf('\n Supervision already knows who you are!\n')
-            clear DataRec
+            fwrite(connection, message, 'uint8');
+            
+            DataRec = [];
+
             
         elseif strcmp(DataRec ,'[SUP]GOTO STORAGE') % (*) Change to one of the possible orders you can receive from the server.
             
@@ -69,7 +70,8 @@ while true
             
             message = uint8('OK\n');
             fwrite(connection, message , 'uint8');
-            clear DataRec
+            
+            DataRec = [];
             
         elseif strcmp(DataRec, 'blablabla') % (*) Change to other possible order you can receive from the server.
             
@@ -77,22 +79,25 @@ while true
             
             message = uint8('OK\n');
             fwrite(connection, message , 'uint8');
-            clear DataRec
+            
+            DataRec = [];
             
         elseif startsWith(DataRec, 'Welcome to the fam, fam!'); 
             
             fprintf('\n Here it comes!\n')
-            clear DataRec
+            
+            DataRec = [];
             
         else % Unpredicted message received
             
             fprintf('\n Something went wrong!\n')
-            clear DataRec
+            
+            DataRec = [];
             
         end
     end
-    
-    clear DataReceived
+    DataReceived = [];
+
 
 end
 
