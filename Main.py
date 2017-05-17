@@ -32,7 +32,8 @@ def request(connection, data):
             data = "ERR"
         finally:
             # Close socket connection
-            connection.close()
+            #connection.close()
+            return data
         return data		
 
 
@@ -43,13 +44,13 @@ if __name__ == "__main__":
     #print host
     host = [socket.gethostname()]
     tcp1 = protocols.TCP(host[0], port=8881)
-    tcp2 = protocols.TCP(host[0], port=8882)
-    tcp3 = protocols.TCP(host[0], port=8883)
-    tcp4 = protocols.TCP(host[0], port=8884)
-    tcp5 = protocols.TCP(host[0], port=8885)
-    tcp6 = protocols.TCP(host[0], port=8886)
+    #tcp2 = protocols.TCP(host[0], port=8882)
+    #tcp3 = protocols.TCP(host[0], port=8883)
+    #tcp4 = protocols.TCP(host[0], port=8884)
+    #tcp5 = protocols.TCP(host[0], port=8885)
+    #tcp6 = protocols.TCP(host[0], port=8886)
 
-    tcp_cons = [tcp1, tcp2, tcp3, tcp4, tcp5, tcp6]
+    tcp_cons = [tcp1]
 
     Station = {}
 
@@ -63,12 +64,9 @@ if __name__ == "__main__":
 	
     stage = 0
     
-    result = request(Station["Belt"], "[SUP]GOTO STORAGE")
-    if result[:-2] == "OK":
+    result = request(Station["Belt"], "GoToQuaCont")
+    if result == "D":
         stage = 1
-        log.info("hurray")
-	
-    #etcetcetc
-
-	#tcp_Belt.request("Start")
-
+        result = request(Station["Belt"], "GoToTrash!!")
+    else:
+        log.error("wtf my boio {}".format(result))

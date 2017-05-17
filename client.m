@@ -82,7 +82,7 @@ while true
             
             DataRec = [];
             
-        elseif startsWith(DataRec, 'Welcome to the fam, fam!'); 
+        elseif strcmp(DataRec, 'Welcome to the fam, fam!'); 
             
             fprintf('\n Here it comes!\n')
             

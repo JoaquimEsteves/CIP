@@ -132,12 +132,15 @@ class TCP(Protocol):
                 #    data_connection = connection.recv(self.buffer_size)
                 data += data_connection
                 log.debug("[TCP] Got back > \"{}\".".format(data[:-2]))
-                if data[:-2] not in settings.acceptable_IDs:
+                if data[:-2] not in settings.acceptable_IDs and data[:-1] not in settings.acceptable_IDs:
                     connection.send("I DON'T KNOW YOU!\n")
                     connection.close()
                 else:
-                    connection.send("Welcome to the fam, fam!\n")
-                    return [connection,data[:-2]]
+                    if data[:-2] != "Belt":
+                        connection.send("Welcome to the fam, fam!\n")
+                        return [connection,data[:-2]]
+                    else:
+                        return [connection,data[:-2]]
                     #station_name = data
                     # #WE GUCCI
                     #if handler != None:
