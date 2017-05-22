@@ -5,6 +5,7 @@ import protocols
 import socket
 import traceback
 import logging
+import time
 #from Station import *
 from utils import Logger
 from thread import start_new_thread
@@ -16,6 +17,7 @@ def request(connection, data):
         """returns the raw response from the host machine"""
         try:
             connection.send(data)
+            log.info("Sent: {}".format(data))
             # Receive data from the socket (max amount is the buffer size).
             data = connection.recv(settings.BUFFERSIZE)
             log.debug("[TCP] Got back > \"{}\".".format(data))

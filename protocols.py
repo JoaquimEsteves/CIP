@@ -122,9 +122,11 @@ class TCP(Protocol):
                 #MONSTERS
                 data = "WhoAreYou"
                 connection.send(data)
+                log.info("sent who are you")
             # Receive data from the socket (max amount is the buffer size).
                 data = ""
                 data_connection = connection.recv(self.buffer_size)
+                log.info("should have received something!")
                 #Keep receiving until I find a \n!
                 #while data_connection[-1] != "\n":
                 #    data += data_connection
