@@ -46,16 +46,16 @@ if __name__ == "__main__":
     #print host
     host = [socket.gethostname()]
     tcp1 = protocols.TCP(host[0], port=8881) #Belt
-    tcp2 = protocols.TCP(host[0], port=8882) #Storage
-    tcp3 = protocols.TCP(host[0], port=8883) #AGV
+    # tcp2 = protocols.TCP(host[0], port=8882) #Storage
+    # tcp3 = protocols.TCP(host[0], port=8883) #AGV
     tcp4 = protocols.TCP(host[0], port=8884) #QC
-    #tcp5 = protocols.TCP(host[0], port=8885)
-    tcp6 = protocols.TCP(host[0], port=8886) #Scorbot
+    #tcp5 = protocols.TCP(host[0], port=8885) #RFID
+    # tcp6 = protocols.TCP(host[0], port=8886) #Scorbot
 
-    tcp_cons = [tcp1,tcp2,tcp4,tcp6]
+    tcp_cons = [tcp1,tcp4]
 
     Station = {}
-
+    
     log.info("Waiting connection from the stations!")
     for tcp in tcp_cons:
         details = tcp.run()
@@ -66,52 +66,61 @@ if __name__ == "__main__":
 	
     # stage = 0
     try:
+        welcome = request(Station["QC"], "QC3")
         result = request(Station["Belt"], "GoToQuaCont")
-        result2 = request(Station["QC"], "QC3")
-        if result == "Done":
-            if result2 != "OK":
-                log.info("result {}".format(result))
-                result = request(Station["Belt"], "GoToTrash!!")
-                if result == "Done":
+        result2 = Station["QC"].recv(settings.BUFFERSIZE)
+        log.info("{} {} {}".format(welcome,result,result2))
+        if result2 == "OK":
+            log.info("we gucci")
+            resBELT = request(Station["Belt"], "GoToStorage")
+            welcome = request(Station["QC"], "QC1")
+            result = request(Station["Belt"], "GoToQuaCont")
+            result2 = Station["QC"].recv(settings.BUFFERSIZE)
+            log.info("{} {} {}".format(welcome,result,result2))
+        # log.info("got {} back from the boys at QC".format(data))
+        # if result == "Done":
+            # if result2 != "OK":
+                # log.info("result {}".format(result))
+                # result = request(Station["Belt"], "GoToTrash!!")
+                # if result == "Done":
                     # time.sleep(5)
-                    result = request(Station["StorageAndAssembly"], "STAGE1")
-                    if result == "OK":
-                        result = request(Station["Belt"], "GoToQuaCont")
-                        result2 = request(Station["QC"], "QC3")
-                        if result == "Done":
-                            log.info("result {}".format(result))
-                            if result2 == "OK":
-                                result = request(Station["Belt"], "GoToStorage")
-                                if result == "Done":
-                                    result = request(Station["StorageAndAssembly"], "STAGE2")
-                                    if result == "OK":
-                                        result = request(Station["Belt"], "GoToQuaCont")
-                                        result2 = request(Station["QC"], "QC1")
-                                        if result == "Done":
-                                            if result2 == "OK":
-                                                result = request(Station["Belt"], "GoToScorbot")
-                                                result2 = request(Station["StorageAndAssembly"], "STAGE3")
-                                                if result == "Done":
-                                                    if result2 == "OK":
-                                                        result = request(Station["AGV"], "GOTO SCORBOT")
-                                                        if result == "OK":
-                                                            result = request(Station["Scorbot"], "EXTRACT")
-                                                            if result == "OK":
-                                                                result = request(Station["AGV"], "GOTO STORAGE")
-                                                                if result == "OK":
-                                                                    log.info("hurray")
+        # result = request(Station["StorageAndAssembly"], "STAGE1")
+        # if result == "OK":
+            # welcome = request(Station["QC"], "QC3")
+            
+            # result = request(Station["Belt"], "GoToQuaCont")
+            # result2 = Station["QC"].recv(settings.BUFFERSIZE)
+            # log.info("got {} back from the boys at QC".format(data))
+            # if result == "Done":
+                # log.info("result {}".format(result))
+                # if result2 == "OK":
+                    # result = request(Station["Belt"], "GoToStorage")
+        # if result == "Done":
+        # result = request(Station["StorageAndAssembly"], "STAGE2")
+        # if result == "OK":
+            # welcome = request(Station["QC"], "QC1")
+            # result = request(Station["Belt"], "GoToQuaCont")
+            # result2 = Station["QC"].recv(settings.BUFFERSIZE)
+            # if result == "Done":
+                # if result2 == "OK":
+        # result = request(Station["Belt"], "GoToScorbot")
+        # result2 = request(Station["StorageAndAssembly"], "STAGE3")
+        # if result == "Done":
+            # if result2 == "OK":
+        # result = request(Station["AGV"], "GOTO SCORBOT")
+        # if result == "OK":
+            # result = request(Station["Scorbot"], "EXTRACT")
+            # if result == "OK":
+                # result = request(Station["AGV"], "GOTO STORAGE")
+                # if result == "OK":
+                    # log.info("hurray")
 
     finally:
-        log.error("result {}".format(result))
-        result = request(Station["Belt"], "GoToTrash!!")
+        # log.error("result {}".format(result))
+        # result = request(Station["Belt"], "GoToTrash!!")
         try:
-            if result == "OK":
-                log.info("closing sucessfully, kindoff")
-                for sta in Station:
-                    Station[sta].close()
-            else:
-                log.error("bad close")
-                for sta in Station:
-                    Station[sta].close()
-        finally:
+            log.info("closing sucessfully, kindoff")
+            for sta in Station:
+                Station[sta].close()
+        except:
             log.error("Complete failure, couldn't even close connections!")
