@@ -45,14 +45,14 @@ if __name__ == "__main__":
     #host = socket.gethostbyaddr(socket.gethostname())
     #print host
     host = [socket.gethostname()]
-    tcp1 = protocols.TCP(host[0], port=8881)
-    #tcp2 = protocols.TCP(host[0], port=8882)
-    #tcp3 = protocols.TCP(host[0], port=8883)
-    #tcp4 = protocols.TCP(host[0], port=8884)
+    tcp1 = protocols.TCP(host[0], port=8881) #Belt
+    tcp2 = protocols.TCP(host[0], port=8882) #Storage
+    tcp3 = protocols.TCP(host[0], port=8883) #AGV
+    tcp4 = protocols.TCP(host[0], port=8884) #QC
     #tcp5 = protocols.TCP(host[0], port=8885)
-    #tcp6 = protocols.TCP(host[0], port=8886)
+    tcp6 = protocols.TCP(host[0], port=8886) #Scorbot
 
-    tcp_cons = [tcp1]
+    tcp_cons = [tcp1,tcp2,tcp4,tcp6]
 
     Station = {}
 
@@ -64,11 +64,54 @@ if __name__ == "__main__":
     
     log.info("Cool, now that we're all connected let's get to work!")
 	
-    stage = 0
-    
-    result = request(Station["Belt"], "GoToQuaCont")
-    if result == "D":
-        stage = 1
+    # stage = 0
+    try:
+        result = request(Station["Belt"], "GoToQuaCont")
+        result2 = request(Station["QC"], "QC3")
+        if result == "Done":
+            if result2 != "OK":
+                log.info("result {}".format(result))
+                result = request(Station["Belt"], "GoToTrash!!")
+                if result == "Done":
+                    # time.sleep(5)
+                    result = request(Station["StorageAndAssembly"], "STAGE1")
+                    if result == "OK":
+                        result = request(Station["Belt"], "GoToQuaCont")
+                        result2 = request(Station["QC"], "QC3")
+                        if result == "Done":
+                            log.info("result {}".format(result))
+                            if result2 == "OK":
+                                result = request(Station["Belt"], "GoToStorage")
+                                if result == "Done":
+                                    result = request(Station["StorageAndAssembly"], "STAGE2")
+                                    if result == "OK":
+                                        result = request(Station["Belt"], "GoToQuaCont")
+                                        result2 = request(Station["QC"], "QC1")
+                                        if result == "Done":
+                                            if result2 == "OK":
+                                                result = request(Station["Belt"], "GoToScorbot")
+                                                result2 = request(Station["StorageAndAssembly"], "STAGE3")
+                                                if result == "Done":
+                                                    if result2 == "OK":
+                                                        result = request(Station["AGV"], "GOTO SCORBOT")
+                                                        if result == "OK":
+                                                            result = request(Station["Scorbot"], "EXTRACT")
+                                                            if result == "OK":
+                                                                result = request(Station["AGV"], "GOTO STORAGE")
+                                                                if result == "OK":
+                                                                    log.info("hurray")
+
+    finally:
+        log.error("result {}".format(result))
         result = request(Station["Belt"], "GoToTrash!!")
-    else:
-        log.error("wtf my boio {}".format(result))
+        try:
+            if result == "OK":
+                log.info("closing sucessfully, kindoff")
+                for sta in Station:
+                    Station[sta].close()
+            else:
+                log.error("bad close")
+                for sta in Station:
+                    Station[sta].close()
+        finally:
+            log.error("Complete failure, couldn't even close connections!")
